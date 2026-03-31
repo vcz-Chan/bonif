@@ -59,7 +59,6 @@ export interface CreateArticleRequest {
   category_id: number;
   title: string;
   content: string;
-  summary?: string | null;
   priority?: number;
   requires_sm?: boolean;
   is_published?: boolean;

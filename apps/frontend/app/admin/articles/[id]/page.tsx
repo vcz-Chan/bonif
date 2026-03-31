@@ -13,14 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { MarkdownContent } from "@/components/ui/markdown-content"
 import { MarkdownEditor } from "@/components/ui/markdown-editor"
-import { Category, Article } from "@/types"
+import type { Category, Article } from "@/types"
 import { useToast } from "@/components/ui/toast"
 
 type ArticleFormState = {
     category_id: number
     title: string
     content: string
-    summary: string
     priority: number
     requires_sm: boolean
     is_published: boolean
@@ -30,7 +29,6 @@ const DEFAULT_ARTICLE_FORM_STATE: ArticleFormState = {
     category_id: 1,
     title: "",
     content: "",
-    summary: "",
     priority: 0,
     requires_sm: false,
     is_published: true
@@ -41,7 +39,6 @@ function toArticleFormState(article: Article): ArticleFormState {
         category_id: article.category_id,
         title: article.title,
         content: article.content,
-        summary: article.summary ?? "",
         priority: article.priority,
         requires_sm: article.requires_sm,
         is_published: article.is_published
@@ -53,7 +50,6 @@ function toArticlePayload(formData: ArticleFormState): CreateArticleRequest {
         category_id: formData.category_id,
         title: formData.title.trim(),
         content: formData.content.trim(),
-        summary: formData.summary.trim() ? formData.summary.trim() : null,
         priority: formData.priority,
         requires_sm: formData.requires_sm,
         is_published: formData.is_published
@@ -256,16 +252,6 @@ export default function ArticleEditPage({ params }: { params: Promise<{ id: stri
                                 onUploadSuccess={() => showToast("이미지를 본문에 추가했습니다.", "success")}
                                 onUploadError={(message) => showToast(message, "error")}
                             />
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">요약 (선택)</label>
-                                <textarea
-                                    className="w-full min-h-[80px] rounded-md border border-slate-200 px-3 py-2 text-sm focus:ring-2 focus:ring-bon-green-start outline-none resize-none"
-                                    placeholder="문서 요약..."
-                                    value={formData.summary}
-                                    onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-                                />
-                            </div>
 
                             <div className="flex gap-6 pt-4 border-t border-slate-100">
                                 <label className="flex items-center gap-2 cursor-pointer">

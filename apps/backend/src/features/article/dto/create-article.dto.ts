@@ -19,11 +19,6 @@ export class CreateArticleDto implements CreateArticleRequest {
   @IsNotEmpty()
   content!: string;
 
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
-  @IsString()
-  @IsOptional()
-  summary?: string | null;
-
   @Type(() => Number)
   @IsInt()
   @Min(0)

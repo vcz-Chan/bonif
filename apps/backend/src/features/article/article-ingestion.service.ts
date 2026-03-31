@@ -38,7 +38,6 @@ export class ArticleIngestionService {
         category_id: input.category_id ?? existing.categoryId,
         title: input.title ?? existing.title,
         content: input.content ?? existing.content,
-        summary: input.summary ?? existing.summary,
         priority: input.priority ?? existing.priority,
         requires_sm: input.requires_sm ?? existing.requiresSm,
         is_published: input.is_published ?? existing.isPublished
@@ -58,11 +57,15 @@ export class ArticleIngestionService {
       content: articleInput.content,
       categoryCode: category.code
     });
+    const summary = retrieval.retrievalKind === "summary" ? retrieval.retrievalText : null;
 
     // 문서 본문과 검색용 임베딩을 하나의 트랜잭션으로 저장해 일관성을 유지한다.
     return this.knowledgeBaseVectorRepository.saveArticleWithRetrieval({
       id,
-      input: articleInput,
+      input: {
+        ...articleInput,
+        summary
+      },
       titleEmbedding,
       retrievalKind: retrieval.retrievalKind,
       retrievalText: retrieval.retrievalText,

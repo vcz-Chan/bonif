@@ -20,11 +20,6 @@ export class UpdateArticleDto implements UpdateArticleRequest {
   @IsOptional()
   content?: string;
 
-  @Transform(({ value }) => (typeof value === "string" ? value.trim() : value))
-  @IsString()
-  @IsOptional()
-  summary?: string | null;
-
   @Type(() => Number)
   @IsInt()
   @Min(0)
