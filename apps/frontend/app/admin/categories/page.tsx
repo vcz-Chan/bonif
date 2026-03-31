@@ -11,7 +11,7 @@ import { createCategory, deleteCategory, getCategories, updateCategory } from "@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Modal } from "@/components/ui/modal"
-import { Category } from "@/types"
+import type { Category } from "@/types"
 import { useToast } from "@/components/ui/toast"
 
 type CategoryFormState = {

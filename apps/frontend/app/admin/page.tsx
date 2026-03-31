@@ -9,7 +9,7 @@ import { useRequireAuth } from "@/components/auth/auth-provider"
 import { getCategories } from "@/lib/api/admin-client"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Category } from "@/types"
+import type { Category } from "@/types"
 import { PreviewChatModal } from "@/components/admin/preview-chat-modal"
 
 export default function AdminDashboard() {

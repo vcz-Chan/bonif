@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useAuth } from "@/components/auth/auth-provider"
 import { login } from "@/lib/api/auth-client"
-import { UserRole } from "@/types"
+import type { UserRole } from "@/types"
 import { useToast } from "@/components/ui/toast"
 
 interface PasswordModalProps {

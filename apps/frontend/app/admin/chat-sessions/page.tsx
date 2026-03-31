@@ -10,7 +10,7 @@ import { useRequireAuth } from "@/components/auth/auth-provider"
 import { getBranchChatMessages, getBranchChatSessions, getBranches } from "@/lib/api/admin-client"
 import { formatKoreanDateTime } from "@/lib/date"
 import { Button } from "@/components/ui/button"
-import { Branch } from "@/types"
+import type { Branch } from "@/types"
 import { useToast } from "@/components/ui/toast"
 
 export default function AdminChatSessionsPage() {

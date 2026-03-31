@@ -9,7 +9,7 @@ import { useRequireAuth } from "@/components/auth/auth-provider"
 import { deleteArticle, getArticles, getCategories } from "@/lib/api/admin-client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Article, Category } from "@/types"
+import type { Article, Category } from "@/types"
 import { useToast } from "@/components/ui/toast"
 
 function ArticleListContent() {

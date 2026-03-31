@@ -9,7 +9,7 @@ import { useRequireAuth } from "@/components/auth/auth-provider"
 import { createChatSession, getChatSessionMessages, getChatSessions, openChatStream } from "@/lib/api/chat-client"
 import { formatKoreanDateTime } from "@/lib/date"
 import { Button } from "@/components/ui/button"
-import { Message } from "@/types"
+import type { Message } from "@/types"
 import { useToast } from "@/components/ui/toast"
 
 function mapChatMessage(message: ChatSessionMessageItem): Message {

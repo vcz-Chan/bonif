@@ -5,7 +5,7 @@ import type { CreateBranchRequest, UpdateBranchRequest } from "@bon/contracts"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Edit, Plus } from "lucide-react"
 
-import { Branch } from "@/types"
+import type { Branch } from "@/types"
 import { LogoutButton } from "@/components/auth/logout-button"
 import { useRequireAuth } from "@/components/auth/auth-provider"
 import { createBranch, getBranches, updateBranch } from "@/lib/api/admin-client"
