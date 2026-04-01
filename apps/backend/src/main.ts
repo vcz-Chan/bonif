@@ -16,6 +16,9 @@ async function bootstrap() {
   const pool = app.get<Pool>(PG_POOL);
   const PgStore = connectPgSimple(session);
 
+  // Trust the single nginx proxy in front so secure session cookies work behind TLS termination.
+  app.set("trust proxy", 1);
+
   app.use(
     session({
       store: new PgStore({
