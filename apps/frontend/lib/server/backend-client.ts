@@ -5,6 +5,17 @@ import { NextResponse } from "next/server";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
+function readSetCookieHeaders(headers: Headers) {
+  const getSetCookie = (headers as Headers & { getSetCookie?: () => string[] }).getSetCookie;
+
+  if (typeof getSetCookie === "function") {
+    return getSetCookie.call(headers).filter(Boolean);
+  }
+
+  const setCookie = headers.get("set-cookie");
+  return setCookie ? [setCookie] : [];
+}
+
 function mergeHeaders(cookieHeader: string | null, extraHeaders?: HeadersInit) {
   const headers = new Headers(extraHeaders);
 
@@ -32,7 +43,7 @@ export async function fetchBackendWithServerCookies(path: string, init?: Request
 
 export async function toJsonResponse(response: Response) {
   const contentType = response.headers.get("content-type") || "";
-  const setCookie = response.headers.get("set-cookie");
+  const setCookies = readSetCookieHeaders(response.headers);
 
   let nextResponse: NextResponse;
   if (contentType.includes("application/json")) {
@@ -46,8 +57,8 @@ export async function toJsonResponse(response: Response) {
     );
   }
 
-  if (setCookie) {
-    nextResponse.headers.set("set-cookie", setCookie);
+  for (const setCookie of setCookies) {
+    nextResponse.headers.append("set-cookie", setCookie);
   }
 
   return nextResponse;
