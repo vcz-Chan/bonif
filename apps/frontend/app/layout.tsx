@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/components/auth/auth-provider";
+import { PageTransition } from "@/components/ui/page-transition";
 import { ToastProvider } from "@/components/ui/toast";
 import { getServerAuthUser } from "@/lib/server-auth";
 
@@ -18,10 +19,10 @@ export default async function RootLayout({
 
   return (
     <html lang="ko">
-      <body className="antialiased font-sans text-slate-900 bg-white">
+      <body suppressHydrationWarning className="antialiased font-sans text-slate-900 bg-white">
         <ToastProvider>
           <AuthProvider initialUser={initialUser}>
-            {children}
+            <PageTransition>{children}</PageTransition>
           </AuthProvider>
         </ToastProvider>
       </body>

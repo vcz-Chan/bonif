@@ -60,13 +60,13 @@ export function MobileChatLayout({
     <div className="relative h-[100dvh] overflow-hidden">
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 right-0 z-30 bg-white border-b border-slate-200 safe-area-top"
+        className="safe-area-top fixed top-0 left-0 right-0 z-30 border-b border-white/70 bg-white/88 backdrop-blur-xl"
       >
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {showBackButton ? (
               <Button
-                variant="ghost"
+                variant="icon"
                 size="icon"
                 onClick={onBack}
                 className="shrink-0"
@@ -75,7 +75,7 @@ export function MobileChatLayout({
               </Button>
             ) : (
               <Button
-                variant="ghost"
+                variant="icon"
                 size="icon"
                 onClick={() => setSidebarOpen(true)}
                 className="shrink-0"
@@ -94,7 +94,7 @@ export function MobileChatLayout({
           <div className="flex items-center gap-1">
             {onNewChat && (
               <Button
-                variant="ghost"
+                variant="icon"
                 size="icon"
                 onClick={() => {
                   closeSidebar()
@@ -111,7 +111,7 @@ export function MobileChatLayout({
       </header>
 
       <main
-        className="h-full overflow-hidden"
+        className="h-full min-h-0 overflow-hidden"
         style={{ paddingTop: `${headerHeight}px` }}
       >
         {children}
@@ -120,21 +120,21 @@ export function MobileChatLayout({
       <>
         {sidebarOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-sm lg:hidden"
             onClick={closeSidebar}
           />
         )}
 
         <aside
-          className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+          className={`fixed top-0 left-0 z-50 h-full w-80 max-w-[85vw] transform border-r border-white/60 bg-white/94 shadow-[0_30px_70px_-30px_rgba(15,23,42,0.45)] backdrop-blur-xl transition-transform duration-300 ease-out lg:hidden ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between p-4 border-b border-slate-200 safe-area-top">
+            <div className="safe-area-top flex items-center justify-between border-b border-slate-200/70 p-4">
               <h2 className="text-lg font-bold text-slate-900">{sidebarTitle}</h2>
               <Button
-                variant="ghost"
+                variant="icon"
                 size="icon"
                 onClick={closeSidebar}
               >
@@ -142,7 +142,7 @@ export function MobileChatLayout({
               </Button>
             </div>
 
-            <div className="flex-1 overflow-y-auto">
+            <div className="scrollbar-hidden flex-1 overflow-y-auto overscroll-contain">
               {sidebarContent}
             </div>
           </div>

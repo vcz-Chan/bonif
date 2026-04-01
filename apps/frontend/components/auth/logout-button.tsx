@@ -10,14 +10,16 @@ import { useAuth } from "@/components/auth/auth-provider"
 
 type LogoutButtonProps = {
     label?: string
-    variant?: "default" | "outline" | "ghost" | "gradient"
+    variant?: "default" | "outline" | "ghost" | "gradient" | "icon"
     className?: string
+    iconOnly?: boolean
 }
 
 export function LogoutButton({
     label = "로그아웃",
     variant = "outline",
-    className
+    className,
+    iconOnly = false
 }: LogoutButtonProps) {
     const router = useRouter()
     const { showToast } = useToast()
@@ -43,11 +45,12 @@ export function LogoutButton({
             type="button"
             variant={variant}
             onClick={() => void handleLogout()}
-            disabled={loading}
+            loading={loading}
+            loadingText="처리 중..."
             className={className}
         >
-            <LogOut className="mr-2 h-4 w-4" />
-            {loading ? "처리 중..." : label}
+            <LogOut className={iconOnly ? "h-4 w-4" : "mr-2 h-4 w-4"} />
+            {iconOnly ? <span className="sr-only">{label}</span> : label}
         </Button>
     )
 }

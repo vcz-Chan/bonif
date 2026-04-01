@@ -23,6 +23,8 @@ export function PasswordModal({ isOpen, onClose, role }: PasswordModalProps) {
     const router = useRouter()
     const { showToast } = useToast()
     const { setAuthenticated } = useAuth()
+    const identifierFieldName = role === "admin" ? "admin-identifier" : "branch-identifier"
+    const passwordFieldName = role === "admin" ? "admin-access-key" : "branch-access-key"
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -56,8 +58,8 @@ export function PasswordModal({ isOpen, onClose, role }: PasswordModalProps) {
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="space-y-2 text-center">
+            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-5">
+                <div className="space-y-2.5 text-center">
                     <h2 className="text-2xl font-bold text-slate-900">
                         {role === 'admin' ? '관리자 인증' : '사장님 인증'}
                     </h2>
@@ -67,31 +69,37 @@ export function PasswordModal({ isOpen, onClose, role }: PasswordModalProps) {
                             : '지점 코드 또는 지점명과 비밀번호를 입력해주세요.'}
                     </p>
                 </div>
-                <div className="space-y-2">
-                    <label className="text-base font-medium text-slate-700">
+                <div className="space-y-3">
+                    <label className="block text-base font-medium text-slate-700">
                         {role === 'admin' ? '아이디' : '지점 코드 또는 지점명'}
                     </label>
                     <Input
                         type="text"
+                        name={identifierFieldName}
                         placeholder={role === 'admin' ? "관리자 아이디를 입력하세요" : "지점 코드 또는 지점명을 입력하세요"}
                         value={identifier}
                         onChange={(e) => setIdentifier(e.target.value)}
                         disabled={isLoading}
-                        className="h-12 text-lg"
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        className="h-14 rounded-xl px-4 text-lg text-slate-900 placeholder:text-slate-400 focus-visible:ring-offset-0"
                     />
                 </div>
-                <div className="space-y-2">
-                    <label className="text-base font-medium text-slate-700">비밀번호</label>
+                <div className="space-y-3">
+                    <label className="block text-base font-medium text-slate-700">비밀번호</label>
                     <Input
                         type="password"
+                        name={passwordFieldName}
                         placeholder="비밀번호를 입력하세요"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         disabled={isLoading}
-                        className="h-12 text-lg"
+                        autoComplete="new-password"
+                        className="h-14 rounded-xl px-4 text-lg text-slate-900 placeholder:text-slate-400 focus-visible:ring-offset-0"
                     />
                 </div>
-                <div className="flex justify-end gap-2 pt-2">
+                <div className="flex justify-end gap-2 pt-3">
                     <Button type="button" variant="ghost" onClick={onClose} disabled={isLoading} className="text-base px-6 h-12">
                         취소
                     </Button>

@@ -132,7 +132,7 @@ export default function AdminBranchesPage() {
     return (
         <div className="min-h-screen p-4 md:p-8">
             <div className="max-w-7xl mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-xl min-h-[calc(100vh-4rem)] overflow-hidden flex flex-col">
-                <header className="bg-white/50 border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 backdrop-blur-md">
+                <header className="bg-white/50 border-b border-slate-200 px-6 py-4 flex flex-wrap items-center justify-between sticky top-0 z-10 backdrop-blur-md">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" onClick={() => router.push("/admin")}>
                             <ArrowLeft className="w-5 h-5 text-slate-500" />
@@ -141,7 +141,7 @@ export default function AdminBranchesPage() {
                     </div>
                     <div className="flex items-center gap-2">
                         <LogoutButton />
-                        <Button variant="gradient" className="gap-2" onClick={openCreate}>
+                        <Button variant="gradient" className="gap-2 text-black hover:text-black" onClick={openCreate}>
                             <Plus className="w-4 h-4" /> 지점 추가
                         </Button>
                     </div>
