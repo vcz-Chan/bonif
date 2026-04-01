@@ -131,7 +131,7 @@
 
 - `Controller`
   - HTTP 입력/출력 담당
-  - DTO validation 적용
+  - `@bon/contracts` 스키마 기반 요청 검증 적용
 - `Service`
   - 도메인 유스케이스 orchestration 담당
 - `Repository`
@@ -164,11 +164,10 @@
   - 일반 JSON 응답은 raw DTO를 직접 반환한다.
 - 전역 예외 응답:
   - `{ ok: false, message, statusCode, path, timestamp, errors? }`
-- ValidationPipe:
-  - `whitelist`
-  - `forbidNonWhitelisted`
-  - `transform`
-  - `enableImplicitConversion`
+- 요청 검증:
+  - 요청 스키마는 `packages/contracts`가 소유한다.
+  - backend controller는 Zod 기반 pipe로 `@Body()`/`@Query()`를 검증한다.
+  - Nest DTO 클래스는 사용하지 않는다.
 
 예외:
 
@@ -214,7 +213,7 @@
 - NestJS 기반 인증/지점/카테고리/문서/채팅/세션 기능 구현
 - 세션 인증 프론트 전환
 - 채팅 세션 목록 및 관리자 대화 조회 UI
-- 전역 validation, 예외 필터
+- 공용 contract 스키마 기반 요청 검증, 예외 필터
 - provider/service/repository 경계 1차 정리
 - `ChatSessionRepository` 분리
 - 성공 응답 raw DTO 방식 단일화

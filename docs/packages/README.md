@@ -5,7 +5,7 @@
 ## 구성
 
 - `packages/contracts`
-  - API 요청/응답 계약 타입
+  - API 요청/응답 계약 스키마와 타입
 - `packages/entities`
   - 인증/콘텐츠/채팅 관련 공통 엔티티 타입
 - `packages/db`
@@ -17,3 +17,4 @@
 
 - [프로젝트 명세](./specification.md)
 - [마이그레이션 현황](./migration-plan.md)
+- [contracts 스키마 문서](./contracts-schema.md)

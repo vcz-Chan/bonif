@@ -19,9 +19,8 @@
 1. `NestFactory.create(AppModule)`
 2. `express-session` 적용
 3. CORS 적용
-4. 전역 `ValidationPipe`
-5. 전역 `ApiExceptionFilter`
-6. `listen`
+4. 전역 `ApiExceptionFilter`
+5. `listen`
 
 현재 상태:
 
@@ -233,11 +232,23 @@ src/
 7. assistant 메시지 저장
 8. JSON 또는 SSE 응답
 
-## DTO / Validation
+## Request Validation
 
-- controller 입력은 DTO 클래스로 받는다.
-- global `ValidationPipe`가 `whitelist`, `forbidNonWhitelisted`, `transform`를 적용한다.
-- path/query 숫자는 `ParseIntPipe` 또는 implicit conversion으로 처리한다.
+- controller 입력 검증은 `@bon/contracts`의 Zod 스키마를 사용한다.
+- backend는 Nest DTO 클래스를 두지 않는다.
+- controller 경계에서 `ZodValidationPipe`로 `@Body()`와 `@Query()`를 검증한다.
+- path 숫자 파라미터는 계속 `ParseIntPipe`를 사용한다.
+- service/repository는 이미 검증된 contract 타입만 받는다.
+
+예시:
+
+- `CreateArticleRequestSchema`
+- `UpdateCategoryRequestSchema`
+- `ChatRequestSchema`
+
+공통 pipe:
+
+- `src/common/pipes/zod-validation.pipe.ts`
 
 ## 응답 전략
 
@@ -252,12 +263,14 @@ src/
 - raw SQL은 vector 전용 repository로 격리돼 있다.
 - 관리자 라우트 prefix가 일관된다.
 - 프론트와 계약이 `@bon/contracts`로 맞춰진다.
+- 요청 검증 규칙과 타입이 `@bon/contracts` 단일 소스에 모인다.
 
 ## 남은 리스크
 
 - 커밋되지 않는 민감 env 파일이 `src/config/.env`에 남아 있다.
 - 세션 테이블 운영 정책과 prune 전략은 아직 단순 기본값이다.
 - HTTP/E2E 회귀 테스트는 아직 없다.
+- 응답 스키마와 프론트 응답 parse는 아직 부분 적용 상태다.
 
 ## 다음 권장 작업
 

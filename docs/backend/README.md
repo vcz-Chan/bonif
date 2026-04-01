@@ -78,7 +78,6 @@ npm run db:seed:admin -- --username admin --display-name "관리자" --password 
   - Nest bootstrap
   - pg-backed session
   - CORS
-  - global validation
   - global exception filter
 
 - `src/app.module.ts`
@@ -104,6 +103,13 @@ npm run db:seed:admin -- --username admin --display-name "관리자" --password 
 
 - SSE 스트림은 일반 JSON 응답이 아니라 이벤트 스트림을 사용한다.
 
+## 요청 검증 원칙
+
+- backend는 Nest DTO 클래스를 사용하지 않는다.
+- 요청 검증 스키마는 `@bon/contracts`가 소유한다.
+- controller는 Zod 기반 pipe로 `@Body()`와 `@Query()`를 검증한다.
+- service는 검증된 계약 타입만 받는다.
+
 ## 상세 문서
 
 - [Nest 구조 문서](./nest-structure.md)
@@ -111,3 +117,4 @@ npm run db:seed:admin -- --username admin --display-name "관리자" --password 
 - [배포 가이드](./deployment.md)
 - [AWS CDK 인프라 관리 계획](./cdk-migration-plan.md)
 - [인프라 운영 및 입력값 가이드](./infra-operations-guide.md)
+- [contracts 스키마 문서](../packages/contracts-schema.md)
