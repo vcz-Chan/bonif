@@ -1,14 +1,22 @@
 import { Body, Controller, Get, Inject, Param, ParseIntPipe, Post, UseGuards } from "@nestjs/common";
 import type {
+  CreateChatMessageRequest,
+  CreateChatSessionRequest,
   ChatSessionListItem,
   ChatSessionMessageItem
+} from "@bon/contracts";
+import {
+  CreateChatMessageRequestSchema,
+  CreateChatSessionRequestSchema
 } from "@bon/contracts";
 import type { SessionUser } from "@bon/entities";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import { BranchSessionGuard } from "../../common/guards/branch-session.guard";
-import { CreateChatMessageDto } from "./dto/create-chat-message.dto";
-import { CreateChatSessionDto } from "./dto/create-chat-session.dto";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe";
 import { ChatSessionService } from "./chat-session.service";
+
+const createChatSessionBodyPipe = new ZodValidationPipe(CreateChatSessionRequestSchema);
+const createChatMessageBodyPipe = new ZodValidationPipe(CreateChatMessageRequestSchema);
 
 @UseGuards(BranchSessionGuard)
 @Controller("chat-sessions")
@@ -23,7 +31,7 @@ export class ChatSessionController {
   @Post()
   create(
     @CurrentUser() user: SessionUser,
-    @Body() body: CreateChatSessionDto
+    @Body(createChatSessionBodyPipe) body: CreateChatSessionRequest
   ): Promise<ChatSessionListItem> {
     return this.chatSessionService.create(user.branchId!, body);
   }
@@ -40,7 +48,7 @@ export class ChatSessionController {
   createMessage(
     @CurrentUser() user: SessionUser,
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: CreateChatMessageDto
+    @Body(createChatMessageBodyPipe) body: CreateChatMessageRequest
   ): Promise<ChatSessionMessageItem> {
     return this.chatSessionService.createMessage(user.branchId!, id, body);
   }

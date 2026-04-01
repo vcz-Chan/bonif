@@ -1,10 +1,13 @@
 import { Body, Controller, Get, Inject, Post, Req, Session } from "@nestjs/common";
+import { AdminLoginRequestSchema, BranchLoginRequestSchema, type AdminLoginRequest, type BranchLoginRequest } from "@bon/contracts";
 import { CurrentUser } from "../../common/decorators/current-user.decorator";
 import type { SessionUser } from "@bon/entities";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe";
 import type { RequestWithSession } from "../../common/types/request-with-session";
-import { AdminLoginDto } from "./dto/admin-login.dto";
-import { BranchLoginDto } from "./dto/branch-login.dto";
 import { AuthService } from "./auth.service";
+
+const adminLoginBodyPipe = new ZodValidationPipe(AdminLoginRequestSchema);
+const branchLoginBodyPipe = new ZodValidationPipe(BranchLoginRequestSchema);
 
 @Controller("auth")
 export class AuthController {
@@ -12,7 +15,7 @@ export class AuthController {
 
   @Post("admin/login")
   async loginAdmin(
-    @Body() body: AdminLoginDto,
+    @Body(adminLoginBodyPipe) body: AdminLoginRequest,
     @Session() session: RequestWithSession["session"]
   ): Promise<SessionUser> {
     const user = await this.authService.loginAdmin(body.username, body.password);
@@ -22,7 +25,7 @@ export class AuthController {
 
   @Post("branch/login")
   async loginBranch(
-    @Body() body: BranchLoginDto,
+    @Body(branchLoginBodyPipe) body: BranchLoginRequest,
     @Session() session: RequestWithSession["session"]
   ): Promise<SessionUser> {
     const user = await this.authService.loginBranch(body.codeOrName, body.password);

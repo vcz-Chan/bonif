@@ -1,10 +1,20 @@
-export type UiMessageRole = "user" | "assistant";
+import { z } from "zod";
+import {
+  optionalNullableBoolean,
+  optionalPositiveInt,
+  optionalTrimmedString,
+  requiredTrimmedString
+} from "./schema-helpers";
 
-export interface ChatReference {
-  article_id: number;
-  category_code: string;
-  title?: string;
-}
+export const UiMessageRoleSchema = z.enum(["user", "assistant"]);
+export type UiMessageRole = z.infer<typeof UiMessageRoleSchema>;
+
+export const ChatReferenceSchema = z.object({
+  article_id: z.coerce.number().int().min(1),
+  category_code: z.string().max(50),
+  title: z.string().max(200).optional()
+}).strict();
+export type ChatReference = z.infer<typeof ChatReferenceSchema>;
 
 export interface UiMessage {
   id?: string;
@@ -30,21 +40,24 @@ export interface ChatSessionMessageItem {
   created_at: string;
 }
 
-export interface CreateChatSessionRequest {
-  title?: string;
-}
+export const CreateChatSessionRequestSchema = z.object({
+  title: optionalTrimmedString(120)
+}).strict();
+export type CreateChatSessionRequest = z.infer<typeof CreateChatSessionRequestSchema>;
 
-export interface CreateChatMessageRequest {
-  content: string;
-  role: UiMessageRole;
-  references?: ChatReference[] | null;
-  fallback_to_sm?: boolean | null;
-}
+export const CreateChatMessageRequestSchema = z.object({
+  content: requiredTrimmedString(),
+  role: UiMessageRoleSchema,
+  references: z.array(ChatReferenceSchema).nullable().optional(),
+  fallback_to_sm: optionalNullableBoolean()
+}).strict();
+export type CreateChatMessageRequest = z.infer<typeof CreateChatMessageRequestSchema>;
 
-export interface ChatRequest {
-  question: string;
-  session_id?: number;
-}
+export const ChatRequestSchema = z.object({
+  question: requiredTrimmedString(),
+  session_id: optionalPositiveInt()
+}).strict();
+export type ChatRequest = z.infer<typeof ChatRequestSchema>;
 
 export interface ChatResponse {
   answer: string;

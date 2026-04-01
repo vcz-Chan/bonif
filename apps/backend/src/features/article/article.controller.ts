@@ -1,12 +1,25 @@
 import { Body, Controller, Delete, Get, Inject, NotFoundException, Param, ParseIntPipe, Post, Put, Query, UseGuards } from "@nestjs/common";
-import type { ArticleSummary, CreateArticleImageUploadUrlResponse } from "@bon/contracts";
+import {
+  CreateArticleImageUploadUrlRequestSchema,
+  CreateArticleRequestSchema,
+  ListArticlesQuerySchema,
+  UpdateArticleRequestSchema,
+  type ArticleSummary,
+  type CreateArticleImageUploadUrlRequest,
+  type CreateArticleImageUploadUrlResponse,
+  type CreateArticleRequest,
+  type ListArticlesQuery,
+  type UpdateArticleRequest
+} from "@bon/contracts";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe";
 import { AdminSessionGuard } from "../../common/guards/admin-session.guard";
 import { ArticleAssetService } from "./article-asset.service";
-import { CreateArticleDto } from "./dto/create-article.dto";
-import { CreateArticleImageUploadUrlDto } from "./dto/create-article-image-upload-url.dto";
-import { ListArticlesQueryDto } from "./dto/list-articles-query.dto";
-import { UpdateArticleDto } from "./dto/update-article.dto";
 import { ArticleService } from "./article.service";
+
+const listArticlesQueryPipe = new ZodValidationPipe(ListArticlesQuerySchema);
+const createArticleBodyPipe = new ZodValidationPipe(CreateArticleRequestSchema);
+const createArticleImageUploadUrlBodyPipe = new ZodValidationPipe(CreateArticleImageUploadUrlRequestSchema);
+const updateArticleBodyPipe = new ZodValidationPipe(UpdateArticleRequestSchema);
 
 @UseGuards(AdminSessionGuard)
 @Controller("admin/articles")
@@ -18,7 +31,7 @@ export class ArticleController {
 
   @Get()
   async list(
-    @Query() query: ListArticlesQueryDto
+    @Query(listArticlesQueryPipe) query: ListArticlesQuery
   ): Promise<{ items: ArticleSummary[]; total: number }> {
     const result = await this.articleService.list(query);
 
@@ -36,13 +49,13 @@ export class ArticleController {
   }
 
   @Post()
-  create(@Body() body: CreateArticleDto): Promise<{ id: number }> {
+  create(@Body(createArticleBodyPipe) body: CreateArticleRequest): Promise<{ id: number }> {
     return this.articleService.create(body);
   }
 
   @Post("presigned-upload")
   createPresignedUpload(
-    @Body() body: CreateArticleImageUploadUrlDto
+    @Body(createArticleImageUploadUrlBodyPipe) body: CreateArticleImageUploadUrlRequest
   ): Promise<CreateArticleImageUploadUrlResponse> {
     return this.articleAssetService.createImageUploadUrl({
       fileName: body.file_name,
@@ -53,7 +66,7 @@ export class ArticleController {
   @Put(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: UpdateArticleDto
+    @Body(updateArticleBodyPipe) body: UpdateArticleRequest
   ): Promise<{ id: number }> {
     return this.articleService.update(id, body);
   }

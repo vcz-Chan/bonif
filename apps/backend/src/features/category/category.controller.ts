@@ -1,9 +1,17 @@
 import { Body, Controller, Delete, Get, Inject, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
-import type { CategorySummary } from "@bon/contracts";
+import {
+  CreateCategoryRequestSchema,
+  UpdateCategoryRequestSchema,
+  type CategorySummary,
+  type CreateCategoryRequest,
+  type UpdateCategoryRequest
+} from "@bon/contracts";
 import { AdminSessionGuard } from "../../common/guards/admin-session.guard";
-import { CreateCategoryDto } from "./dto/create-category.dto";
-import { UpdateCategoryDto } from "./dto/update-category.dto";
+import { ZodValidationPipe } from "../../common/pipes/zod-validation.pipe";
 import { CategoryService } from "./category.service";
+
+const createCategoryBodyPipe = new ZodValidationPipe(CreateCategoryRequestSchema);
+const updateCategoryBodyPipe = new ZodValidationPipe(UpdateCategoryRequestSchema);
 
 @UseGuards(AdminSessionGuard)
 @Controller("admin/categories")
@@ -16,14 +24,14 @@ export class CategoryController {
   }
 
   @Post()
-  create(@Body() body: CreateCategoryDto): Promise<CategorySummary> {
+  create(@Body(createCategoryBodyPipe) body: CreateCategoryRequest): Promise<CategorySummary> {
     return this.categoryService.create(body);
   }
 
   @Put(":id")
   async update(
     @Param("id", ParseIntPipe) id: number,
-    @Body() body: UpdateCategoryDto
+    @Body(updateCategoryBodyPipe) body: UpdateCategoryRequest
   ): Promise<CategorySummary> {
     return this.categoryService.update(id, body);
   }

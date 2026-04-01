@@ -1,5 +1,11 @@
 import { Inject, Injectable } from "@nestjs/common";
-import type { ArticleDetail, ArticleSummary, CreateArticleRequest, UpdateArticleRequest } from "@bon/contracts";
+import type {
+  ArticleDetail,
+  ArticleSummary,
+  CreateArticleRequest,
+  ListArticlesQuery,
+  UpdateArticleRequest
+} from "@bon/contracts";
 import { ArticleIngestionService } from "./article-ingestion.service";
 import { ArticleRepository } from "./article.repository";
 
@@ -10,12 +16,7 @@ export class ArticleService {
     @Inject(ArticleIngestionService) private readonly articleIngestionService: ArticleIngestionService
   ) {}
 
-  async list(params: {
-    category_id?: number;
-    is_published?: boolean;
-    page?: number;
-    page_size?: number;
-  }): Promise<{ data: ArticleSummary[]; total: number }> {
+  async list(params: ListArticlesQuery): Promise<{ data: ArticleSummary[]; total: number }> {
     return this.articleRepository.list(params);
   }
 

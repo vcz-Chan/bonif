@@ -1,9 +1,14 @@
-export type LegacyAuthMode = "admin" | "user";
+import { z } from "zod";
+import { requiredTrimmedString } from "./schema-helpers";
 
-export interface VerifyPasswordRequest {
-  mode: LegacyAuthMode;
-  password: string;
-}
+export const LegacyAuthModeSchema = z.enum(["admin", "user"]);
+export type LegacyAuthMode = z.infer<typeof LegacyAuthModeSchema>;
+
+export const VerifyPasswordRequestSchema = z.object({
+  mode: LegacyAuthModeSchema,
+  password: z.string().min(1)
+}).strict();
+export type VerifyPasswordRequest = z.infer<typeof VerifyPasswordRequestSchema>;
 
 export interface VerifyPasswordResponse {
   role: "admin" | "branch";
@@ -13,15 +18,17 @@ export interface VerifyPasswordResponse {
   branchName?: string;
 }
 
-export interface AdminLoginRequest {
-  username: string;
-  password: string;
-}
+export const AdminLoginRequestSchema = z.object({
+  username: requiredTrimmedString(),
+  password: z.string().min(1)
+}).strict();
+export type AdminLoginRequest = z.infer<typeof AdminLoginRequestSchema>;
 
-export interface BranchLoginRequest {
-  codeOrName: string;
-  password: string;
-}
+export const BranchLoginRequestSchema = z.object({
+  codeOrName: requiredTrimmedString(),
+  password: z.string().min(1)
+}).strict();
+export type BranchLoginRequest = z.infer<typeof BranchLoginRequestSchema>;
 
 export interface AuthUserPayload {
   role: "admin" | "branch";
