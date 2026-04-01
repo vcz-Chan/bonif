@@ -74,7 +74,7 @@ jobs:
           cd infra/cdk
           npm install
           npx cdk deploy --require-approval never --outputs-file cdk-outputs.json
-          npm run export:backend-env -- --file cdk-outputs.json --stack BonInfraStack > backend.env
+          node scripts/export-backend-env.mjs --file cdk-outputs.json --stack BonInfraStack > backend.env
           cat backend.env >> "$GITHUB_ENV"
 
           while IFS='=' read -r key value; do
