@@ -37,7 +37,7 @@ export function Modal({ isOpen, onClose, children, title, panelClassName, bodyCl
 
                 {title && (
                     <div className="mb-4 pr-10">
-                        <h2 className="text-xl font-bold">{title}</h2>
+                        <h2 className="text-xl font-bold text-black">{title}</h2>
                     </div>
                 )}
 
