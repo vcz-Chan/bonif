@@ -1,5 +1,5 @@
-import { Controller, Get, Inject, Param, ParseIntPipe, UseGuards } from "@nestjs/common";
-import type { ChatSessionListItem, ChatSessionMessageItem } from "@bon/contracts";
+import { Controller, DefaultValuePipe, Get, Inject, Param, ParseIntPipe, Query, UseGuards } from "@nestjs/common";
+import type { AdminRecentActivityItem, ChatSessionListItem, ChatSessionMessageItem } from "@bon/contracts";
 import { AdminSessionGuard } from "../../common/guards/admin-session.guard";
 import { ChatSessionService } from "./chat-session.service";
 
@@ -7,6 +7,13 @@ import { ChatSessionService } from "./chat-session.service";
 @Controller("admin/chat-sessions")
 export class ChatSessionAdminController {
   constructor(@Inject(ChatSessionService) private readonly chatSessionService: ChatSessionService) {}
+
+  @Get("recent-activities")
+  listRecentActivities(
+    @Query("limit", new DefaultValuePipe(5), ParseIntPipe) limit: number
+  ): Promise<AdminRecentActivityItem[]> {
+    return this.chatSessionService.listRecentActivities(limit);
+  }
 
   @Get("branches/:branchId")
   listByBranch(@Param("branchId", ParseIntPipe) branchId: number): Promise<ChatSessionListItem[]> {

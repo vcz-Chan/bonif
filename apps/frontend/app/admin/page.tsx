@@ -1,6 +1,7 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import type { AdminRecentActivityItem } from "@bon/contracts"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
     BarChart3,
@@ -18,15 +19,22 @@ import { LogoutButton } from "@/components/auth/logout-button"
 import { useRequireAuth } from "@/components/auth/auth-provider"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { getCategories } from "@/lib/api/admin-client"
+import { Spinner } from "@/components/ui/spinner"
+import { getCategories, getRecentActivities } from "@/lib/api/admin-client"
+import { formatRelativeKoreanTime } from "@/lib/date"
 import type { Category } from "@/types"
 
 export default function AdminPage() {
     const router = useRouter()
     const [categories, setCategories] = useState<Category[]>([])
+    const [recentActivities, setRecentActivities] = useState<AdminRecentActivityItem[]>([])
     const [loading, setLoading] = useState(true)
+    const [recentActivitiesLoading, setRecentActivitiesLoading] = useState(false)
+    const [recentActivitiesError, setRecentActivitiesError] = useState<string | null>(null)
     const [previewOpen, setPreviewOpen] = useState(false)
     const [activeSection, setActiveSection] = useState<"overview" | "categories">("overview")
+    const [isDesktopViewport, setIsDesktopViewport] = useState(false)
+    const recentActivitiesRequestRef = useRef(0)
 
     const { isAuthorized, isLoading } = useRequireAuth({
         requiredRole: "admin",
@@ -43,10 +51,72 @@ export default function AdminPage() {
         }
     }, [])
 
+    const fetchRecentActivities = useCallback(async () => {
+        const requestId = ++recentActivitiesRequestRef.current
+        setRecentActivitiesLoading(true)
+        setRecentActivitiesError(null)
+
+        try {
+            const items = await getRecentActivities(5)
+
+            if (requestId !== recentActivitiesRequestRef.current) {
+                return
+            }
+
+            setRecentActivities(items)
+        } catch (error) {
+            if (requestId !== recentActivitiesRequestRef.current) {
+                return
+            }
+
+            console.error(error)
+            setRecentActivities([])
+            setRecentActivitiesError(
+                error instanceof Error ? error.message : "최근 활동을 불러오지 못했습니다."
+            )
+        } finally {
+            if (requestId === recentActivitiesRequestRef.current) {
+                setRecentActivitiesLoading(false)
+            }
+        }
+    }, [])
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia("(min-width: 1024px)")
+        const syncViewport = () => {
+            setIsDesktopViewport(mediaQuery.matches)
+        }
+
+        syncViewport()
+
+        if (typeof mediaQuery.addEventListener === "function") {
+            mediaQuery.addEventListener("change", syncViewport)
+            return () => mediaQuery.removeEventListener("change", syncViewport)
+        }
+
+        mediaQuery.addListener(syncViewport)
+        return () => mediaQuery.removeListener(syncViewport)
+    }, [])
+
     useEffect(() => {
         if (!isAuthorized) return
         void fetchCategories()
     }, [fetchCategories, isAuthorized])
+
+    useEffect(() => {
+        if (!isAuthorized || !isDesktopViewport || activeSection !== "overview") {
+            if (!isDesktopViewport) {
+                recentActivitiesRequestRef.current += 1
+                setRecentActivities([])
+                setRecentActivitiesLoading(false)
+                setRecentActivitiesError(null)
+            }
+
+            return
+        }
+
+        void fetchRecentActivities()
+    }, [activeSection, fetchRecentActivities, isAuthorized, isDesktopViewport])
 
     if (isLoading || !isAuthorized) {
         return <div className="p-8 text-center text-slate-500">권한 확인 중...</div>
@@ -154,19 +224,42 @@ export default function AdminPage() {
                                 </div>
 
                                 <div className="bg-white rounded-xl border border-slate-200 p-6">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-4">최근 활동</h3>
+                                    <h3 className="text-lg font-bold text-slate-900 mb-4">최근 대화</h3>
                                     <div className="space-y-3">
-                                        {[1, 2, 3].map((i) => (
-                                            <div key={i} className="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50">
-                                                <div className="w-2 h-2 rounded-full bg-green-500" />
-                                                <div className="flex-1">
-                                                    <p className="text-sm font-medium text-slate-900">
-                                                        지점 B{i}001에서 새로운 대화 시작
-                                                    </p>
-                                                    <p className="text-xs text-slate-500">방금 전</p>
-                                                </div>
+                                        {recentActivitiesLoading ? (
+                                            <div className="flex items-center gap-3 rounded-lg bg-slate-50 p-4 text-sm text-slate-500">
+                                                <Spinner size="sm" className="text-bon-green-start" />
+                                                최근 활동을 불러오는 중...
                                             </div>
-                                        ))}
+                                        ) : recentActivitiesError ? (
+                                            <div className="rounded-lg bg-rose-50 p-4 text-sm text-rose-600">
+                                                {recentActivitiesError}
+                                            </div>
+                                        ) : recentActivities.length === 0 ? (
+                                            <div className="rounded-lg bg-slate-50 p-4 text-sm text-slate-500">
+                                                표시할 최근 활동이 없습니다.
+                                            </div>
+                                        ) : (
+                                            recentActivities.map((activity) => (
+                                                <div
+                                                    key={activity.message_id}
+                                                    className="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50"
+                                                >
+                                                    <div className="mt-1.5 w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-medium text-slate-900">
+                                                            지점 {activity.branch_code}의 최근 문의
+                                                        </p>
+                                                        <p className="mt-1 text-xs text-slate-500 line-clamp-1">
+                                                            {activity.message}
+                                                        </p>
+                                                        <p className="mt-1 text-xs text-slate-400">
+                                                            {formatRelativeKoreanTime(activity.created_at)}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             </>

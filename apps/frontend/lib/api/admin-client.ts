@@ -1,4 +1,5 @@
 import type {
+  AdminRecentActivityItem,
   ArticleSummary,
   BranchSummary,
   CategorySummary,
@@ -98,6 +99,14 @@ export function getBranchChatMessages(branchId: number, sessionId: number) {
     `/api/admin/chat-sessions/branches/${branchId}/${sessionId}/messages`,
     { cache: "no-store" },
     "메시지를 불러오지 못했습니다."
+  );
+}
+
+export function getRecentActivities(limit = 5) {
+  return apiGet<AdminRecentActivityItem[]>(
+    `/api/admin/chat-sessions/recent-activities?limit=${limit}`,
+    { cache: "no-store" },
+    "최근 활동을 불러오지 못했습니다."
   );
 }
 

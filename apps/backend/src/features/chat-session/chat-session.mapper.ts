@@ -1,4 +1,8 @@
-import type { ChatSessionListItem, ChatSessionMessageItem } from "@bon/contracts";
+import type {
+  AdminRecentActivityItem,
+  ChatSessionListItem,
+  ChatSessionMessageItem
+} from "@bon/contracts";
 import { chatMessages, chatSessions } from "@bon/db";
 
 export function toChatSessionListItem(row: typeof chatSessions.$inferSelect): ChatSessionListItem {
@@ -23,6 +27,26 @@ export function toChatSessionMessageItem(row: typeof chatMessages.$inferSelect):
         title: reference.title
       })) ?? null,
     fallback_to_sm: row.fallbackToSm,
+    created_at: row.createdAt.toISOString()
+  };
+}
+
+export function toAdminRecentActivityItem(row: {
+  messageId: number;
+  sessionId: number;
+  branchId: number;
+  branchCode: string;
+  branchName: string;
+  message: string;
+  createdAt: Date;
+}): AdminRecentActivityItem {
+  return {
+    message_id: row.messageId,
+    session_id: row.sessionId,
+    branch_id: row.branchId,
+    branch_code: row.branchCode,
+    branch_name: row.branchName,
+    message: row.message,
     created_at: row.createdAt.toISOString()
   };
 }

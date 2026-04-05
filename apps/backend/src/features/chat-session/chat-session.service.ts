@@ -1,11 +1,16 @@
 import { Inject, Injectable, NotFoundException } from "@nestjs/common";
 import type {
+  AdminRecentActivityItem,
   ChatSessionListItem,
   ChatSessionMessageItem,
   CreateChatMessageRequest,
   CreateChatSessionRequest
 } from "@bon/contracts";
-import { toChatSessionListItem, toChatSessionMessageItem } from "./chat-session.mapper";
+import {
+  toAdminRecentActivityItem,
+  toChatSessionListItem,
+  toChatSessionMessageItem
+} from "./chat-session.mapper";
 import { ChatSessionRepository } from "./chat-session.repository";
 
 @Injectable()
@@ -15,6 +20,12 @@ export class ChatSessionService {
   async listByBranch(branchId: number): Promise<ChatSessionListItem[]> {
     const rows = await this.chatSessionRepository.listByBranch(branchId);
     return rows.map(toChatSessionListItem);
+  }
+
+  async listRecentActivities(limit: number): Promise<AdminRecentActivityItem[]> {
+    const safeLimit = Math.max(1, Math.min(limit, 5));
+    const rows = await this.chatSessionRepository.listRecentActivities(safeLimit);
+    return rows.map(toAdminRecentActivityItem);
   }
 
   async create(branchId: number, input: CreateChatSessionRequest): Promise<ChatSessionListItem> {

@@ -40,6 +40,16 @@ export interface ChatSessionMessageItem {
   created_at: string;
 }
 
+export interface AdminRecentActivityItem {
+  message_id: number;
+  session_id: number;
+  branch_id: number;
+  branch_code: string;
+  branch_name: string;
+  message: string;
+  created_at: string;
+}
+
 export const CreateChatSessionRequestSchema = z.object({
   title: optionalTrimmedString(120)
 }).strict();

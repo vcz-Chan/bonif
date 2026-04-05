@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common";
-import { chatMessages, chatSessions } from "@bon/db";
+import { branches, chatMessages, chatSessions } from "@bon/db";
 import { and, asc, desc, eq } from "drizzle-orm";
 import { DRIZZLE_DB } from "../../infrastructure/database/drizzle.constants";
 import type { DrizzleDb } from "../../infrastructure/database/drizzle.types";
@@ -14,6 +14,25 @@ export class ChatSessionRepository {
       .from(chatSessions)
       .where(eq(chatSessions.branchId, branchId))
       .orderBy(desc(chatSessions.lastMessageAt), desc(chatSessions.id));
+  }
+
+  listRecentActivities(limit: number) {
+    return this.db
+      .select({
+        messageId: chatMessages.id,
+        sessionId: chatSessions.id,
+        branchId: branches.id,
+        branchCode: branches.code,
+        branchName: branches.name,
+        message: chatMessages.content,
+        createdAt: chatMessages.createdAt
+      })
+      .from(chatMessages)
+      .innerJoin(chatSessions, eq(chatSessions.id, chatMessages.sessionId))
+      .innerJoin(branches, eq(branches.id, chatSessions.branchId))
+      .where(eq(chatMessages.role, "user"))
+      .orderBy(desc(chatMessages.createdAt), desc(chatMessages.id))
+      .limit(limit);
   }
 
   async create(branchId: number, title?: string | null) {
