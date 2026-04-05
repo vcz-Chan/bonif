@@ -55,7 +55,29 @@ function ArticleListContent() {
         void fetchArticles()
     }, [fetchArticles, fetchCategories, isAuthorized])
 
+    useEffect(() => {
+        setSelectedCategory(categoryIdParam || "")
+    }, [categoryIdParam])
+
     const filteredArticles = articles.filter(a => a.title.includes(search))
+
+    const navigateToArticle = (articleId: number) => {
+        router.push(`/admin/articles/${articleId}`)
+    }
+
+    const handleCategoryChange = (value: string) => {
+        setSelectedCategory(value)
+
+        const params = new URLSearchParams(searchParams.toString())
+        if (value) {
+            params.set("category", value)
+        } else {
+            params.delete("category")
+        }
+
+        const query = params.toString()
+        router.replace(query ? `/admin/articles?${query}` : "/admin/articles")
+    }
 
     const handleDelete = async (articleId: number) => {
         if (!confirm("정말 삭제하시겠습니까?")) return;
@@ -76,14 +98,14 @@ function ArticleListContent() {
     return (
         <div className="min-h-screen p-4 md:p-8">
             <div className="max-w-7xl mx-auto bg-white/90 backdrop-blur-sm rounded-xl shadow-xl min-h-[calc(100vh-4rem)] overflow-hidden flex flex-col">
-                <header className="bg-white/50 border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 backdrop-blur-md">
-                    <div className="flex items-center gap-4">
+                <header className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white/50 px-4 py-4 backdrop-blur-md md:px-6">
+                    <div className="flex min-w-0 items-center gap-3 md:gap-4">
                         <Button variant="ghost" size="icon" onClick={() => router.push('/admin')}>
                             <ArrowLeft className="w-5 h-5 text-slate-500" />
                         </Button>
                         <h1 className="text-xl font-bold text-slate-900">문서 관리</h1>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
                         <LogoutButton />
                         <Button
                             variant="gradient"
@@ -100,14 +122,14 @@ function ArticleListContent() {
                     </div>
                 </header>
 
-                <main className="flex-1 px-6 py-8 space-y-6">
+                <main className="flex-1 space-y-6 px-4 py-6 md:px-6 md:py-8">
                     {/* Filters */}
                     <div className="flex flex-col md:flex-row gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
                         <div className="flex-1 max-w-xs">
                             <select
                                 className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-bon-green-start"
                                 value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                onChange={(e) => handleCategoryChange(e.target.value)}
                             >
                                 <option value="">전체 카테고리</option>
                                 {categories.map(c => (
@@ -128,15 +150,15 @@ function ArticleListContent() {
 
                     {/* Table */}
                     <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left min-w-[600px]">
+                        <div className="overflow-x-auto md:overflow-visible">
+                            <table className="w-full min-w-0 text-left text-sm md:min-w-[600px]">
                                 <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
                                     <tr>
                                         <th className="px-4 py-3 md:px-6 w-16 md:w-20">ID</th>
-                                        <th className="px-4 py-3 md:px-6 w-24 md:w-32">카테고리</th>
+                                        <th className="hidden w-24 px-4 py-3 md:table-cell md:w-32 md:px-6">카테고리</th>
                                         <th className="px-4 py-3 md:px-6">제목</th>
-                                        <th className="px-4 py-3 md:px-6 w-24 md:w-32">상태</th>
-                                        <th className="px-4 py-3 md:px-6 w-24 md:w-32 text-right">관리</th>
+                                        <th className="hidden w-24 px-4 py-3 md:table-cell md:w-32 md:px-6">상태</th>
+                                        <th className="hidden w-24 px-4 py-3 text-right md:table-cell md:w-32 md:px-6">관리</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
@@ -148,16 +170,25 @@ function ArticleListContent() {
                                         const catParams = categories.find(c => c.id === String(article.category_id));
                                         return (
                                             <tr key={article.id} className="hover:bg-slate-50/50 transition-colors">
-                                                <td className="px-4 py-3 md:px-6 md:py-4 text-slate-500 align-middle">#{article.id}</td>
-                                                <td className="px-4 py-3 md:px-6 md:py-4 align-middle">
+                                                <td className="px-4 py-3 align-middle text-slate-500 md:px-6 md:py-4">#{article.id}</td>
+                                                <td className="hidden px-4 py-3 align-middle md:table-cell md:px-6 md:py-4">
                                                     <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs whitespace-nowrap">
                                                         {catParams?.name || 'Unknown'}
                                                     </span>
                                                 </td>
-                                                <td className="px-4 py-3 md:px-6 md:py-4 font-medium text-slate-900 align-middle">
-                                                    <div className="line-clamp-1">{article.title}</div>
+                                                <td className="px-4 py-3 align-middle font-medium text-slate-900 md:px-6 md:py-4">
+                                                    <button
+                                                        type="button"
+                                                        className="w-full text-left"
+                                                        onClick={() => navigateToArticle(article.id)}
+                                                    >
+                                                        <div className="line-clamp-2 md:line-clamp-1">{article.title}</div>
+                                                        <div className="mt-1 text-xs font-normal text-slate-400 md:hidden">
+                                                            탭해서 상세에서 확인
+                                                        </div>
+                                                    </button>
                                                 </td>
-                                                <td className="px-4 py-3 md:px-6 md:py-4 align-middle">
+                                                <td className="hidden px-4 py-3 align-middle md:table-cell md:px-6 md:py-4">
                                                     {article.is_published ? (
                                                         <span className="text-green-600 flex items-center gap-1 text-xs font-semibold whitespace-nowrap">
                                                             <span className="w-1.5 h-1.5 rounded-full bg-green-500" /> 게시중
@@ -166,11 +197,11 @@ function ArticleListContent() {
                                                         <span className="text-slate-400 text-xs whitespace-nowrap">비공개</span>
                                                     )}
                                                 </td>
-                                                <td className="px-4 py-3 md:px-6 md:py-4 text-right align-middle">
+                                                <td className="hidden px-4 py-3 text-right align-middle md:table-cell md:px-6 md:py-4">
                                                     <div className="flex justify-end gap-2">
                                                         <button
                                                             className="p-1.5 rounded hover:bg-slate-100 text-slate-500 hover:text-blue-600 transition-colors"
-                                                            onClick={() => router.push(`/admin/articles/${article.id}`)}
+                                                            onClick={() => navigateToArticle(article.id)}
                                                         >
                                                             <Edit className="w-4 h-4" />
                                                         </button>
